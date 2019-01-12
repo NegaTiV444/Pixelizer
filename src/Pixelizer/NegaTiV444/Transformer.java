@@ -8,7 +8,11 @@ import javafx.scene.paint.Color;
 
 public class Transformer {
 
-    public static WritableImage transform(Image img, int pixelSize)
+    //Brightness = -1/0/1 - make image darker/don't change/brighter
+    //Saturation = -1/0/1 - desaturate/don't change/saturate image
+    //isInvert = false/true don't change/invert colors
+
+    public static WritableImage transform(Image img, int pixelSize, int brightness, int saturation, boolean isInvert)
     {
         int height = (int)img.getHeight(), width = (int)img.getWidth();
         WritableImage resultImg = new WritableImage(width, height);
@@ -47,10 +51,19 @@ public class Transformer {
                 }
                 newColor = new Color(R/pixelSize/pixelSize, G/pixelSize/pixelSize, B/pixelSize/pixelSize, 1.0);
                 sizeX = pixelSize;
-                newColor = newColor.brighter();
-                newColor = newColor.saturate();
+                if (brightness == -1)
+                    newColor = newColor.darker();
+                else
+                    if (brightness == 1)
+                        newColor = newColor.brighter();
 
-
+                if (saturation == -1)
+                    newColor = newColor.desaturate();
+                else
+                    if (saturation == 1)
+                        newColor = newColor.saturate();
+                if (isInvert)
+                    newColor = newColor.invert();
                 for (x = i * pixelSize; sizeX > 0; x++, sizeX--)
                 {
                     sizeY = pixelSize;
@@ -59,7 +72,9 @@ public class Transformer {
                         pw.setColor(x, y, newColor);
                     }
                 }
+
             }
+
             //TODO Fix delta-line
 //            for (int i = 0; deltaW > 0; i++, deltaW--)
 //                for (int j = 0; deltaH > 0; j++, deltaH--)

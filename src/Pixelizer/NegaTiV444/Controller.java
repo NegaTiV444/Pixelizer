@@ -5,10 +5,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.Slider;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
@@ -61,6 +58,12 @@ public class Controller {
     private RadioButton rbStSat;
 
     @FXML
+    private Button btTransform;
+
+    @FXML
+    private ToggleButton btInvert;
+
+    @FXML
     void initialize() {
 
     }
@@ -69,14 +72,13 @@ public class Controller {
     private void OpenFile()
     {
 
-        FileChooser fileChooser = new FileChooser();//Класс работы с диалогом выборки и сохранения
-        fileChooser.setTitle("Open File");//Заголовок диалога
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open File");
         try
         {
-            File file = fileChooser.showOpenDialog(STAGE);//Указываем текущую сцену
+            File file = fileChooser.showOpenDialog(STAGE);
             currentImage = new Image(file.toURI().toString());
             imgInitial.setImage(currentImage);
-            imgTransformed.setImage(Transformer.transform(currentImage, 16));
         }
         catch (Exception e)
         {
@@ -86,9 +88,35 @@ public class Controller {
 
     }
 
+    @FXML
+    private void btTransformClick()
+    {
+        if (currentImage != null) {
+            int brightness, saturation, pixelSize;
+            boolean isInvert;
+            if (rbBrighter.isSelected())
+                brightness = 1;
+            else if (rbDarker.isSelected())
+                brightness = -1;
+            else
+                brightness = 0;
+
+            if (rbSaturate.isSelected())
+                saturation = 1;
+            else if (rbDesaturate.isSelected())
+                saturation = -1;
+            else
+                saturation = 0;
+            pixelSize = (int) transformLvl.getValue();
+            isInvert = btInvert.isSelected();
+            imgTransformed.setImage(Transformer.transform(currentImage, pixelSize, brightness, saturation, isInvert));
+        }
+        else
+            showAlert("Error", "Please select image");
+    }
 
     private void showAlert(String headerText, String contentText) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
         alert.setHeaderText(headerText);
         alert.setContentText(contentText);
